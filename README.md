@@ -37,14 +37,14 @@
 
 To install Diamond Media Player, follow these steps:
 
-1. Download the latest release for your operating system from the [releases page](https://github.com/WillTDA/Diamond-Media-Player/releases).
+1. Download the latest release for Windows from the [releases page](https://github.com/WillTDA/Diamond-Media-Player/releases).
 2. Run the installer and follow the on-screen instructions.
 3. Launch Diamond Media Player and start enjoying your media!
 
 ## Usage
 
 1. Open Diamond Media Player.
-2. Click the "Open File" button or use the menu to select a media file.
+2. Click the "Open File" button or use the menu to select a media file. Alternatively, drag and drop a file onto the player, or even use the "Open With" context menu option in Windows Explorer.
 3. Use the playback controls to manage your media playback.
 4. Enjoy the visualiser and LUFS metering while your media plays!
 
@@ -70,7 +70,7 @@ To set up the development environment:
 
 ## Building
 
-To build the application for your platform:
+To build the application, run the following command:
 
 ```
 npm run build
