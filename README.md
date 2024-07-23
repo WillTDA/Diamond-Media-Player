@@ -1,11 +1,12 @@
-<center style="margin-bottom:1rem;">
-<img alt="Diamond Digital Development Logo" src="./src/assets/diamondmediaplayer.png" style="width:100px;height:auto;margin-bottom:1rem;" />
-
-# Diamond Media Player
-
-An Electron-based media player for Windows with advanced audio visualisation and LUFS metering capabilities.
-
+<center>
+   <img align="center" alt="Diamond Digital Development Logo" src="./src/assets/diamondmediaplayer.png" style="width:100px;height:auto;margin-bottom:1rem;" />
 </center>
+
+<h1 align="center">
+   Diamond Media Player
+</h1>
+
+<center style="margin-bottom:1rem;">An Electron-based media player for Windows with advanced audio visualisation and LUFS metering capabilities.</center>
 
 <div align="center">
 
