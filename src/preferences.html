@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diamond Media Player | Preferences</title>
+  <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="./assets/fonts/icons/icons.css">
+</head>
+
+<body class="popup-window">
+  <h1>Preferences</h1>
+  <label for="visualiserFftSize">Visualiser Quality:</label>
+  <select id="visualiserFftSize">
+    <option value="4096">Highest</option>
+    <option value="2048">High</option>
+    <option value="1024">Medium</option>
+    <option value="512">Low</option>
+    <option value="256">Lowest</option>
+  </select>
+
+  <script>
+    const { ipcRenderer } = require('electron');
+    document.getElementById('visualiserFftSize').addEventListener('change', (event) => {
+      ipcRenderer.send('save-preferences', { visualiserFftSize: event.target.value }, true); // Reload all preferences
+    });
+
+    //when the page loads, request the current preferences
+    ipcRenderer.send('request-preferences');
+    ipcRenderer.on('current-preferences', (event, preferences) => {
+      document.getElementById('visualiserFftSize').value = preferences.visualiserFftSize || '1024';
+    });
+  </script>
+</body>
+
+</html>

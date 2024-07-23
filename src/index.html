@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diamond Media Player</title>
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="./assets/fonts/icons/icons.css">
+</head>
+
+<body class="bg-dark text-light">
+    <div id="app-container">
+        <button id="openFile" class="btn btn-primary">Open File</button>
+
+        <div id="main-content">
+            <h2 id="now-playing" class="text-center mb-4">No File Selected</h2>
+            <div id="media-container">
+                <img id="logo" src="./assets/diamondmediaplayer.png" alt="Diamond Media Player Logo">
+                <video id="videoPlayer" class="d-none"></video>
+                <canvas id="visualiser-canvas" class="d-none"></canvas>
+                <div id="meters-container">
+                    <canvas id="left-gain-canvas" class="gain-canvas d-none"></canvas>
+                    <canvas id="right-gain-canvas" class="gain-canvas d-none"></canvas>
+                </div>
+            </div>
+            <div id="lufs-display" class="d-none">Please select a file to play...</div>
+        </div>
+
+        <div id="controls" class="d-none">
+            <div class="controls-wrapper">
+                <p id="currentFile" class="text-center">[title]</p>
+                <div class="progress-bar-container">
+                    <span id="current-time">00:00</span>
+                    <div id="progress-bar">
+                        <div id="progress"></div>
+                    </div>
+                    <span id="remaining-time">00:00</span>
+                </div>
+                <div class="buttons-container">
+                    <button id="prevButton" class="control-button" disabled><i
+                            class="material-icons-round">skip_previous</i></button>
+                    <button id="playPauseButton" class="control-button"><i
+                            class="material-icons-round">play_circle</i></button>
+                    <button id="nextButton" class="control-button" disabled><i
+                            class="material-icons-round">skip_next</i></button>
+                </div>
+                <audio id="audioPlayer" class="d-none"></audio>
+            </div>
+            <div class="volume-container">
+                <i class="material-icons-round volume-icon">volume_up</i>
+                <div class="volume-slider-container">
+                    <input type="range" id="volumeSlider" min="0" max="100" value="100" orient="vertical">
+                </div>
+            </div>
+        </div>
+        <div id="drop-area" class="d-none">
+            <div class="drop-area-text">
+                <p>Drop file to play...</p>
+            </div>
+        </div>
+    </div>
+    <script src="renderer.js"></script>
+</body>
+
+</html>

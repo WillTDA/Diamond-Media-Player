@@ -1,0 +1,61 @@
+{
+  "name": "diamond-media-player",
+  "version": "1.0.0",
+  "description": "An open-source media player for Windows built with Electron.",
+  "main": "main.js",
+  "funding": {
+    "type": "buymeacoffee",
+    "url": "https://www.buymeacoffee.com/willtda"
+  },
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WillTDA/Diamond-Media-Player"
+  },
+  "build": {
+    "appId": "com.diamonddigitaldev.diamondmediaplayer",
+    "productName": "Diamond Media Player",
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "src/assets/diamondmediaplayer.ico",
+      "fileAssociations": [
+        {
+          "ext": [
+            "mp3",
+            "aac", "m4a",
+            "ogg", "opus",
+            "wav"
+          ],
+          "name": "Audio File",
+          "role": "Viewer"
+        },
+        {
+          "ext": [
+            "mp4",
+            "webm",
+            "mkv",
+            "ogv"
+          ],
+          "name": "Video File",
+          "role": "Viewer"
+        }
+      ]
+    }
+  },
+  "keywords": [],
+  "author": "WillTDA",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "electron": "^31.1.0",
+    "electron-builder": "^24.13.3"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.3",
+    "electron-store": "^8.2.0"
+  }
+}
