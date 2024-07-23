@@ -90,7 +90,7 @@ Diamond Media Player is licensed under the Apache 2.0 License. See the [LICENSE]
 
 ## Contact Us
 
-- 🎮 Need help or want to chat? [Join our Discord Server](https://discord.gg/your-invite-link)!
+- 🎮 Need help or want to chat? [Join our Discord Server](https://diamonddigital.dev/discord)!
 - 🐛 Found a bug? [Open an issue](https://github.com/WillTDA/Diamond-Media-Player/issues) on our GitHub repository.
 - 💡 Have a feature request? [Submit it here](https://github.com/WillTDA/Diamond-Media-Player/issues/new?labels=enhancement)!
 
