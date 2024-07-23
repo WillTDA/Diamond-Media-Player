@@ -17,6 +17,18 @@ function createWindow() {
     icon: path.join(__dirname, 'assets', 'diamondmediaplayer.ico')
   });
 
+  let gotTheLock = app.requestSingleInstanceLock();
+  if (!gotTheLock) {
+    app.quit();
+  } else {
+    app.on('second-instance', () => {
+      if (win) {
+        if (win.isMinimized()) win.restore();
+        win.focus();
+      }
+    });
+  }
+
   win.loadFile(path.join(__dirname, 'src', 'index.html'));
   //win.webContents.openDevTools();
 
