@@ -28,7 +28,7 @@ function createWindow() {
       }
 
       // Extract and handle the file path if provided in command line arguments
-      const filePath = commandLine.find(arg => /\.(mp3|wav|ogg|mp4|webm|mkv|ogv)$/.test(arg));
+      const filePath = commandLine.find(arg => /\.(mp3|aac|m4a|ogg|opus|wav|mp4|webm|mkv|ogv)$/.test(arg));
       if (filePath) {
         handleFileOpen(filePath);
       }
@@ -44,7 +44,7 @@ function createWindow() {
   function handleOpenDialog() {
     dialog.showOpenDialog({
       properties: ['openFile'],
-      filters: [{ name: 'Audio', extensions: ['mp3', 'wav', 'ogg'] }, { name: 'Video', extensions: ['mp4', 'webm', 'mkv', 'ogv'] }],
+      filters: [{ name: 'Audio', extensions: ['mp3', 'aac', 'm4a', 'ogg', 'opus', 'wav'] }, { name: 'Video', extensions: ['mp4', 'webm', 'mkv', 'ogv'] }],
       defaultPath: store.get('lastOpenedDirectory', app.getPath('music')),
     }).then(result => {
       console.log(result);
