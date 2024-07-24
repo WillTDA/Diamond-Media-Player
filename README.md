@@ -20,7 +20,7 @@
 <div align="center">
   <h4>Diamond Media Player Demo</h4>
   <video style="width:50%;height:auto;border-radius:5px;" controls>
-    <source src="./demo.mp4" type="video/mp4">
+    <source src="https://github.com/user-attachments/assets/e345f8b1-bda2-43ef-9d10-e8b2be29ada2" type="video/mp4">
   </video>
 </div>
 
