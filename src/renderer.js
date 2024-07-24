@@ -31,7 +31,7 @@ let dataArray;
 let currentFolder = null;
 let currentIndex = -1;
 let playlist = [];
-let supportedFormats = ['mp3','aac', 'm4a', 'ogg', 'opus', 'wav', '.mp4', '.webm', '.mkv', '.ogv'];
+let supportedFormats = ['.mp3','.aac', '.m4a', '.ogg', '.opus', '.wav', '.mp4', '.webm', '.mkv', '.ogv'];
 
 // variables customisable by the user
 let visualiserFftSize = 1024;
