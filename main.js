@@ -21,11 +21,39 @@ function createWindow() {
   if (!gotTheLock) {
     app.quit();
   } else {
-    app.on('second-instance', () => {
+    app.on('second-instance', (event, commandLine, workingDirectory) => {
       if (win) {
         if (win.isMinimized()) win.restore();
         win.focus();
       }
+
+      // Extract and handle the file path if provided in command line arguments
+      const filePath = commandLine.find(arg => /\.(mp3|wav|ogg|mp4|webm|mkv|ogv)$/.test(arg));
+      if (filePath) {
+        handleFileOpen(filePath);
+      }
+    });
+  }
+
+  function handleFileOpen(filePath) {
+    if (win) {
+      win.webContents.send('selected-file', filePath);
+    }
+  }
+
+  function handleOpenDialog() {
+    dialog.showOpenDialog({
+      properties: ['openFile'],
+      filters: [{ name: 'Audio', extensions: ['mp3', 'wav', 'ogg'] }, { name: 'Video', extensions: ['mp4', 'webm', 'mkv', 'ogv'] }],
+      defaultPath: store.get('lastOpenedDirectory', app.getPath('music')),
+    }).then(result => {
+      console.log(result);
+      if (!result.canceled) {
+        store.set('lastOpenedDirectory', path.dirname(result.filePaths[0]));
+        handleFileOpen(result.filePaths[0]);
+      }
+    }).catch(err => {
+      console.log(err);
     });
   }
 
@@ -41,7 +69,7 @@ function createWindow() {
   app.on('open-file', (event, filePath) => {
     event.preventDefault();
     if (win) {
-      win.webContents.send('selected-file', filePath);
+      handleFileOpen(filePath);
     }
   });
 
@@ -49,7 +77,7 @@ function createWindow() {
   if (process.argv.length >= 2) {
     const filePath = process.argv[1];
     if (win) {
-      win.webContents.send('selected-file', filePath);
+      handleFileOpen(filePath);
     }
   }
 
@@ -64,19 +92,7 @@ function createWindow() {
         {
           label: 'Open File',
           accelerator: process.platform === 'darwin' ? 'Cmd+O' : 'Ctrl+O',
-          click: () => {
-            dialog.showOpenDialog({
-              properties: ['openFile'],
-              filters: [{ name: 'Audio', extensions: ['mp3', 'wav', 'ogg'] }, { name: 'Video', extensions: ['mp4', 'webm', 'mkv', 'ogv'] }]
-            }).then(result => {
-              console.log(result);
-              if (!result.canceled) {
-                win.webContents.send('selected-file', result.filePaths[0]);
-              }
-            }).catch(err => {
-              console.log(err);
-            });
-          }
+          click: handleOpenDialog
         },
         {
           label: 'Toggle Full Screen',
@@ -156,18 +172,7 @@ function createWindow() {
     }
   });
 
-  ipcMain.on('open-file-dialog', (event) => {
-    dialog.showOpenDialog({
-      properties: ['openFile'],
-      filters: [{ name: 'Audio', extensions: ['mp3', 'wav', 'ogg'] }, { name: 'Video', extensions: ['mp4', 'webm', 'mkv', 'ogv'] }]
-    }).then(result => {
-      if (!result.canceled) {
-        event.reply('selected-file', result.filePaths[0]);
-      }
-    }).catch(err => {
-      console.log(err);
-    });
-  });
+  ipcMain.on('open-file-dialog', handleOpenDialog);
 
   ipcMain.on('save-preferences', (event, preferences, reload = true) => {
     if (preferences.visualiserFftSize) { store.set('visualiserFftSize', preferences.visualiserFftSize); }
@@ -176,7 +181,6 @@ function createWindow() {
 
     // Reload all preferences if requested
     if (reload) win.webContents.send('load-preferences', store.store);
-
   });
 
   ipcMain.on('request-preferences', (event) => {
