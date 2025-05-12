@@ -61,7 +61,7 @@ function createWindow() {
   }
 
   win.loadFile(path.join(__dirname, 'src', 'index.html'));
-  win.webContents.openDevTools();
+  //win.webContents.openDevTools();
 
   // Send saved preferences and any pending file to renderer process
   win.webContents.on('did-finish-load', () => {
