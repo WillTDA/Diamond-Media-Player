@@ -1,6 +1,6 @@
 {
   "name": "diamond-media-player",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "An open-source media player for Windows built with Electron.",
   "main": "main.js",
   "funding": {
@@ -27,8 +27,10 @@
         {
           "ext": [
             "mp3",
-            "aac", "m4a",
-            "ogg", "opus",
+            "aac",
+            "m4a",
+            "ogg",
+            "opus",
             "wav"
           ],
           "name": "Audio File",
