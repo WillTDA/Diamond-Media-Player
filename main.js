@@ -4,6 +4,7 @@ const Store = require('electron-store');
 const store = new Store();
 
 function createWindow() {
+  let pendingFileToOpen = null;
   const win = new BrowserWindow({
     width: 1280,
     height: 720,
@@ -36,8 +37,10 @@ function createWindow() {
   }
 
   function handleFileOpen(filePath) {
-    if (win) {
+    if (win && win.webContents && win.webContents.isLoadingMainFrame() === false) {
       win.webContents.send('selected-file', filePath);
+    } else {
+      pendingFileToOpen = filePath;
     }
   }
 
@@ -58,25 +61,27 @@ function createWindow() {
   }
 
   win.loadFile(path.join(__dirname, 'src', 'index.html'));
-  //win.webContents.openDevTools();
+  win.webContents.openDevTools();
 
-  // Send saved preferences to renderer process
+  // Send saved preferences and any pending file to renderer process
   win.webContents.on('did-finish-load', () => {
     win.webContents.send('load-preferences', store.store);
+    if (pendingFileToOpen) {
+      win.webContents.send('selected-file', pendingFileToOpen);
+      pendingFileToOpen = null;
+    }
   });
 
   // Handle the 'open-file' event
   app.on('open-file', (event, filePath) => {
     event.preventDefault();
-    if (win) {
-      handleFileOpen(filePath);
-    }
+    handleFileOpen(filePath);
   });
 
   // Handle command-line arguments for other platforms
   if (process.argv.length >= 2) {
-    const filePath = process.argv[1];
-    if (win) {
+    const filePath = process.argv.find(arg => /\.(mp3|aac|m4a|ogg|opus|wav|mp4|webm|mkv|ogv)$/.test(arg));
+    if (filePath) {
       handleFileOpen(filePath);
     }
   }
@@ -99,6 +104,10 @@ function createWindow() {
           accelerator: 'F11',
           click: () => {
             win.setFullScreen(!win.isFullScreen());
+            if (win && !win.isDestroyed()) {
+              const showMenu = win.isFullScreen();
+              win.setMenuBarVisibility(!showMenu);
+            }
           }
         },
         { type: 'separator' },
@@ -111,12 +120,14 @@ function createWindow() {
     },
     {
       label: 'Preferences',
+      accelerator: 'P',
       click: () => {
         createPreferencesWindow();
       }
     },
     {
       label: 'Credits',
+      accelerator: 'C',
       click: () => {
         createCreditsWindow();
       }
@@ -175,11 +186,15 @@ function createWindow() {
   ipcMain.on('open-file-dialog', handleOpenDialog);
 
   ipcMain.on('save-preferences', (event, preferences, reload = true) => {
-    if (preferences.visualiserFftSize) { store.set('visualiserFftSize', preferences.visualiserFftSize); }
-
-    if (preferences.volume) { store.set('volume', preferences.volume); }
-
-    // Reload all preferences if requested
+    if (preferences.visualiserFftSize) {
+      store.set('visualiserFftSize', preferences.visualiserFftSize);
+    }
+    if (preferences.volume) {
+      store.set('volume', preferences.volume);
+    }
+    if (preferences.eqStaysPaused !== undefined) {
+      store.set('eqStaysPaused', preferences.eqStaysPaused);
+    }
     if (reload) win.webContents.send('load-preferences', store.store);
   });
 

@@ -31,16 +31,19 @@ let dataArray;
 let currentFolder = null;
 let currentIndex = -1;
 let playlist = [];
-let supportedFormats = ['.mp3','.aac', '.m4a', '.ogg', '.opus', '.wav', '.mp4', '.webm', '.mkv', '.ogv'];
+let supportedFormats = ['.mp3', '.aac', '.m4a', '.ogg', '.opus', '.wav', '.mp4', '.webm', '.mkv', '.ogv'];
 
 // variables customisable by the user
 let visualiserFftSize = 1024;
 let volume = 100; // default volume is max
 
+// New global preference variables with default values:
+let lastDataArray = null;
+
 ipcRenderer.on('load-preferences', async (event, preferences) => {
     console.log('Loading preferences:', preferences);
     if (preferences.visualiserFftSize) visualiserFftSize = parseInt(preferences.visualiserFftSize, 10);
-
+    if (preferences.eqStaysPaused !== undefined) prefEqStaysPaused = preferences.eqStaysPaused;
     if (preferences.volume) {
         volume = parseInt(preferences.volume, 10);
         volumeSlider.value = volume;
@@ -48,7 +51,6 @@ ipcRenderer.on('load-preferences', async (event, preferences) => {
         videoPlayer.volume = volume / 100;
         updateVolumeIcon(volume / 100);
     }
-
     setupVisualiser();
 });
 
@@ -116,6 +118,8 @@ function hideAudioUI() {
     lufsDisplay.classList.add('d-none');
     document.getElementById('left-gain-canvas').classList.add('d-none');
     document.getElementById('right-gain-canvas').classList.add('d-none');
+    document.getElementById('controls').style.backgroundColor = 'rgba(20, 20, 20, 0.75)';
+    document.getElementById('app-container').style.backgroundColor = 'black !important';
 }
 
 function showAudioUI() {
@@ -123,6 +127,8 @@ function showAudioUI() {
     lufsDisplay.classList.remove('d-none');
     document.getElementById('left-gain-canvas').classList.remove('d-none');
     document.getElementById('right-gain-canvas').classList.remove('d-none');
+    document.getElementById('controls').style.backgroundColor = 'rgba(40, 40, 40, 0.5)';
+    document.getElementById('app-container').style.backgroundColor = 'rgb(26, 26, 26) !important';
 }
 
 function updateButtonStates() {
@@ -226,8 +232,11 @@ function seek(e) {
 
 function formatTime(seconds) {
     if (isNaN(seconds)) return '--:--';
-    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
     const remainingSeconds = Math.floor(seconds % 60);
+
+    if (hours > 0) return `${hours}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
     return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
 }
 
@@ -272,6 +281,7 @@ function setupVisualiser() {
     analyser.fftSize = visualiserFftSize;
     const bufferLength = analyser.frequencyBinCount;
     dataArray = new Uint8Array(bufferLength);
+    lastDataArray = new Uint8Array(bufferLength); // store initial copy
 
     const canvasCtx = visualiser.getContext('2d');
 
@@ -297,12 +307,18 @@ function setupVisualiser() {
     function draw() {
         animationFrameId = requestAnimationFrame(draw);
 
+        // If EQ should stay in place when paused, skip updating if media is paused.
+        const mediaPlayer = videoPlayer.classList.contains('d-none') ? audioPlayer : videoPlayer;
+        if (prefEqStaysPaused && mediaPlayer.paused) {
+            // Do not update visuals
+            return;
+        }
+
         analyser.getByteFrequencyData(dataArray);
+        lastDataArray = dataArray.slice();
 
-        // Update main visualiser
+        // Update visualisations
         updateMainVisualiser(canvasCtx, bufferLength);
-
-        // Update LUFS display
         updateLUFSDisplay();
     }
 
@@ -504,5 +520,86 @@ document.addEventListener('drop', function (event) {
         currentFolder = path.dirname(filePath);
         loadPlaylist(currentFolder, filePath);
         loadMedia(filePath);
+    }
+});
+
+// Playback controls idle hide for video mode
+let controlsHideTimeout = null;
+function scheduleControlsHide() {
+    clearTimeout(controlsHideTimeout);
+    controlsHideTimeout = setTimeout(() => {
+        // Only hide if video player is visible and is playing
+        if (!videoPlayer.classList.contains('d-none') && !videoPlayer.paused) {
+            controls.style.transition = 'transform 0.5s ease';
+            controls.style.transform = 'translateY(100%)';
+        }
+    }, 2000);
+}
+
+function showControls() {
+    clearTimeout(controlsHideTimeout);
+    controls.style.transition = 'transform 0.3s ease';
+    controls.style.transform = 'translateY(0)';
+    // Reschedule hiding if video is playing
+    if (!videoPlayer.classList.contains('d-none') && !videoPlayer.paused) {
+        scheduleControlsHide();
+    }
+}
+document.addEventListener('mousemove', showControls);
+document.addEventListener('mousedown', showControls);
+videoPlayer.addEventListener('pause', showControls);
+document.addEventListener('mouseleave', () => {
+    if (!videoPlayer.classList.contains('d-none') && !videoPlayer.paused) {
+        controls.style.transform = 'translateY(100%)';
+    }
+});
+videoPlayer.addEventListener('play', scheduleControlsHide);
+
+document.addEventListener('keydown', function (e) {
+    // Ignore if focus is on an input, textarea, or contenteditable element
+    const active = document.activeElement;
+    if (
+        active && (
+            active.tagName === 'INPUT' ||
+            active.tagName === 'TEXTAREA' ||
+            active.isContentEditable
+        )
+    ) return;
+
+    const mediaPlayer = videoPlayer.classList.contains('d-none') ? audioPlayer : videoPlayer;
+
+    switch (e.code) {
+        case 'Space':
+            e.preventDefault();
+            togglePlayPause();
+            break;
+        case 'ArrowLeft':
+            e.preventDefault();
+            mediaPlayer.currentTime = Math.max(0, mediaPlayer.currentTime - 10);
+            break;
+        case 'ArrowRight':
+            e.preventDefault();
+            mediaPlayer.currentTime = Math.min(mediaPlayer.duration || 0, mediaPlayer.currentTime + 10);
+            break;
+        case 'ArrowUp':
+            e.preventDefault();
+            let newVolUp = Math.min(1, mediaPlayer.volume + 0.05);
+            mediaPlayer.volume = newVolUp;
+            audioPlayer.volume = newVolUp;
+            videoPlayer.volume = newVolUp;
+            volumeSlider.value = Math.round(newVolUp * 100);
+            updateVolumeIcon(newVolUp);
+            ipcRenderer.send('save-preferences', { volume: volumeSlider.value }, false);
+            break;
+        case 'ArrowDown':
+            e.preventDefault();
+            let newVolDown = Math.max(0, mediaPlayer.volume - 0.05);
+            mediaPlayer.volume = newVolDown;
+            audioPlayer.volume = newVolDown;
+            videoPlayer.volume = newVolDown;
+            volumeSlider.value = Math.round(newVolDown * 100);
+            updateVolumeIcon(newVolDown);
+            ipcRenderer.send('save-preferences', { volume: volumeSlider.value }, false);
+            break;
     }
 });

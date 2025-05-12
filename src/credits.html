@@ -42,6 +42,10 @@
         document.getElementById("github").addEventListener("click", () => {
             shell.openExternal("https://github.com/WillTDA/Diamond-Media-Player");
         });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') window.close();
+        });
     </script>
 </body>
 

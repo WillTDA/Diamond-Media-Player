@@ -21,16 +21,35 @@
     <option value="256">Lowest</option>
   </select>
 
+  <div style="margin-bottom: 18px;" class="toggle-switch-container">
+    <label style="display: flex; align-items: center; gap: 12px;">
+      <span class="toggle-switch-label">Freeze monitoring on pause</span>
+      <span class="toggle-switch">
+        <input type="checkbox" id="eqStaysPaused">
+        <span class="toggle-slider"></span>
+      </span>
+    </label>
+  </div>
+
   <script>
     const { ipcRenderer } = require('electron');
     document.getElementById('visualiserFftSize').addEventListener('change', (event) => {
       ipcRenderer.send('save-preferences', { visualiserFftSize: event.target.value }, true); // Reload all preferences
+    });
+    document.getElementById('eqStaysPaused').addEventListener('change', (event) => {
+      ipcRenderer.send('save-preferences', { eqStaysPaused: event.target.checked }, true);
     });
 
     //when the page loads, request the current preferences
     ipcRenderer.send('request-preferences');
     ipcRenderer.on('current-preferences', (event, preferences) => {
       document.getElementById('visualiserFftSize').value = preferences.visualiserFftSize || '1024';
+      document.getElementById('eqStaysPaused').checked = preferences.eqStaysPaused || false;
+    });
+
+    // close if user hits escape
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') window.close();
     });
   </script>
 </body>
