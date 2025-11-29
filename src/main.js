@@ -1,7 +1,9 @@
 const { app, BrowserWindow, ipcMain, dialog, Menu, globalShortcut, shell } = require('electron');
+const fs = require('fs');
 const path = require('path');
 const Store = require('electron-store');
 const store = new Store();
+const { AUDIO_EXTENSIONS, VIDEO_EXTENSIONS, FILE_REGEX } = require('./constants');
 
 function createWindow() {
   let pendingFileToOpen = null;
@@ -29,7 +31,7 @@ function createWindow() {
       }
 
       // Extract and handle the file path if provided in command line arguments
-      const filePath = commandLine.find(arg => /\.(mp3|aac|m4a|ogg|opus|wav|mp4|webm|mkv|ogv)$/.test(arg));
+      const filePath = commandLine.find(arg => FILE_REGEX.test(arg));
       if (filePath) {
         handleFileOpen(filePath);
       }
@@ -45,10 +47,20 @@ function createWindow() {
   }
 
   function handleOpenDialog() {
+    let lastDir = store.get('lastOpenedDirectory');
+
+    // Validate directory
+    if (!lastDir || !fs.existsSync(lastDir)) {
+      lastDir = app.getPath('music');
+    }
+
     dialog.showOpenDialog({
       properties: ['openFile'],
-      filters: [{ name: 'Audio', extensions: ['mp3', 'aac', 'm4a', 'ogg', 'opus', 'wav'] }, { name: 'Video', extensions: ['mp4', 'webm', 'mkv', 'ogv'] }],
-      defaultPath: store.get('lastOpenedDirectory', app.getPath('music')),
+      filters: [
+        { name: 'Audio', extensions: AUDIO_EXTENSIONS },
+        { name: 'Video', extensions: VIDEO_EXTENSIONS }
+      ],
+      defaultPath: lastDir,
     }).then(result => {
       console.log(result);
       if (!result.canceled) {
@@ -60,8 +72,8 @@ function createWindow() {
     });
   }
 
-  win.loadFile(path.join(__dirname, 'src', 'index.html'));
-  //win.webContents.openDevTools();
+  win.loadFile(path.join(__dirname, 'index.html'));
+  win.webContents.openDevTools();
 
   // Send saved preferences and any pending file to renderer process
   win.webContents.on('did-finish-load', () => {
@@ -80,7 +92,7 @@ function createWindow() {
 
   // Handle command-line arguments for other platforms
   if (process.argv.length >= 2) {
-    const filePath = process.argv.find(arg => /\.(mp3|aac|m4a|ogg|opus|wav|mp4|webm|mkv|ogv)$/.test(arg));
+    const filePath = process.argv.find(arg => FILE_REGEX.test(arg));
     if (filePath) {
       handleFileOpen(filePath);
     }
@@ -144,14 +156,25 @@ function createWindow() {
       parent: win,
       modal: true,
       resizable: false,
+      minimizable: false,
+      maximizable: false,
+      fullscreenable: false,
       webPreferences: {
         nodeIntegration: true,
         contextIsolation: false
-      }
+      },
+      icon: path.join(__dirname, 'assets', 'diamondmediaplayer.ico')
     });
 
     preferencesWindow.setMenu(null);
-    preferencesWindow.loadFile('src/preferences.html');
+    preferencesWindow.loadFile(path.join(__dirname, 'preferences.html'));
+
+    // Ensure it cannot be minimized (also disable minimize/maximize buttons)
+    preferencesWindow.on('minimize', (e) => {
+      e.preventDefault();
+      preferencesWindow.show();
+      preferencesWindow.focus();
+    });
   }
 
   function createCreditsWindow() {
@@ -161,14 +184,25 @@ function createWindow() {
       parent: win,
       modal: true,
       resizable: false,
+      minimizable: false,
+      maximizable: false,
+      fullscreenable: false,
       webPreferences: {
         nodeIntegration: true,
         contextIsolation: false
-      }
+      },
+      icon: path.join(__dirname, 'assets', 'diamondmediaplayer.ico')
+    });
+
+    // Ensure it cannot be minimized (also disable minimize/maximize buttons)
+    creditsWindow.on('minimize', (e) => {
+      e.preventDefault();
+      creditsWindow.show();
+      creditsWindow.focus();
     });
 
     creditsWindow.setMenu(null);
-    creditsWindow.loadFile('src/credits.html');
+    creditsWindow.loadFile(path.join(__dirname, 'credits.html'));
   }
 
   app.on('window-all-closed', () => {

@@ -2,6 +2,10 @@ const { ipcRenderer } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
+const { VIDEO_EXTENSIONS, ALL_EXTENSIONS } = require('./constants');
+const SUPPORTED_EXTS_SET = new Set(ALL_EXTENSIONS.map(ext => `.${ext}`));
+const VIDEO_EXTS_SET = new Set(VIDEO_EXTENSIONS.map(ext => `.${ext}`));
+
 const openFileBtn = document.getElementById('openFile');
 const audioPlayer = document.getElementById('audioPlayer');
 const videoPlayer = document.getElementById('videoPlayer');
@@ -31,11 +35,11 @@ let dataArray;
 let currentFolder = null;
 let currentIndex = -1;
 let playlist = [];
-let supportedFormats = ['.mp3', '.aac', '.m4a', '.ogg', '.opus', '.wav', '.mp4', '.webm', '.mkv', '.ogv'];
 
 // variables customisable by the user
 let visualiserFftSize = 1024;
 let volume = 100; // default volume is max
+let prefEqStaysPaused = false;
 
 // New global preference variables with default values:
 let lastDataArray = null;
@@ -73,7 +77,10 @@ function loadPlaylist(folder, selectedFile) {
             console.error('Error reading directory:', err);
             return;
         }
-        playlist = files.filter(file => supportedFormats.includes(path.extname(file).toLowerCase()));
+        playlist = files.filter(file => {
+            const ext = path.extname(file).toLowerCase();
+            return SUPPORTED_EXTS_SET.has(ext);
+        });
         currentIndex = playlist.indexOf(path.basename(selectedFile));
         updateButtonStates();
     });
@@ -82,9 +89,9 @@ function loadPlaylist(folder, selectedFile) {
 function loadMedia(filePath) {
     if (!filePath) return;
     const ext = path.extname(filePath).toLowerCase();
-    if (!supportedFormats.includes(ext)) return;
+    if (!SUPPORTED_EXTS_SET.has(ext)) return;
 
-    const isVideo = ['.mp4', '.webm', '.mkv', '.ogv'].includes(ext);
+    const isVideo = VIDEO_EXTS_SET.has(ext);
     const mediaElement = isVideo ? videoPlayer : audioPlayer;
 
     document.getElementById('logo').classList.add('d-none'); // Hide logo
