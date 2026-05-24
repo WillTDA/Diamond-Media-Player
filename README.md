@@ -28,17 +28,17 @@ https://github.com/user-attachments/assets/5faa179e-6057-4f43-a198-9bf9f3418cc2
 
 ## Features
 
-- 🎵 <b>Multi-Format Support</b> | Play various audio and video formats with ease.
+- <b>Multi-Format Support</b> | Play various audio and video formats with ease.
 
-- 📊 <b>Advanced Visualiser</b> | Enjoy a stunning audio visualiser that brings your music to life.
+- <b>Advanced Visualiser</b> | Enjoy a stunning audio visualiser that brings your music to life.
 
-- 📏 <b>LUFS Metering</b> | Professional-grade loudness measurement for audio enthusiasts and professionals.
+- <b>LUFS Metering</b> | Professional-grade loudness measurement for audio enthusiasts and professionals.
 
-- 🎚️ <b>Dual-Channel RMS Display</b> | Monitor left and right channel levels independently.
+- <b>Dual-Channel RMS Display</b> | Monitor left and right channel levels independently.
 
-- 🎨 <b>Modern UI</b> | Sleek, intuitive interface designed for a seamless user experience.
+- <b>Modern UI</b> | Sleek, intuitive interface designed for a seamless user experience.
 
-- ⚙️ <b>Customisable Settings</b> | Tailor the player to your preferences with adjustable tempo, pitch and visualiser quality settings.
+- <b>Customisable Settings</b> | Tailor the player to your preferences with adjustable tempo, pitch and visualiser quality settings.
 
 ## Installation
 
@@ -97,11 +97,10 @@ Diamond Media Player is licensed under the Apache 2.0 License. See the [LICENSE]
 
 ## Contact Us
 
-- 🎮 Need help or want to chat? [Join our Discord Server](https://diamonddigital.dev/discord)!
-- 🐛 Found a bug? [Open an issue](https://github.com/diamonddigitaldev/Diamond-Media-Player/issues) on our GitHub repository.
-- 💡 Have a feature request? [Submit it here](https://github.com/diamonddigitaldev/Diamond-Media-Player/issues/new?labels=enhancement)!
+- Need help or want to chat? [Join our Discord Server](https://diamonddigital.dev/discord)!
+- Found a bug? [Open an issue](https://github.com/diamonddigitaldev/Diamond-Media-Player/issues) on our GitHub repository.
+- Have a feature request? [Submit it here](https://github.com/diamonddigitaldev/Diamond-Media-Player/issues/new?labels=enhancement)!
 
----
 
 <div align="center">
   <a href="https://diamonddigital.dev/">
