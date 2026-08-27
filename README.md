@@ -95,6 +95,11 @@ Diamond Media Player is licensed under the Apache 2.0 License. See the [LICENSE]
 - Built with [Electron](https://www.electronjs.org/)
 - Visualiser powered by Web Audio API
 
+
+### AI Disclosure
+
+This project uses AI tools to aid development. Read our [AI Transparency & Quality Commitment](https://diamonddigital.dev/ai-transparency) statement for more information.
+
 ## Contact Us
 
 - Need help or want to chat? [Join our Discord Server](https://diamonddigital.dev/discord)!
